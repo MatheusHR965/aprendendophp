@@ -20,12 +20,12 @@ $uf = "";
 //Validando a existencia dos dados
 if(isset($_POST["nome"]) && isset($_POST["email"]) && isset($_POST["cidade"]) && isset($_POST["UF"]))
 {
-    if(empty($_POST["nome"]))
+    if(empty($_POST["nome"])){
         $erro = "Campo nome obrigatorio";
-
-        else
-        if(empty($_POST["email"]))
-            $erro = "Campo e-mail obrigatorio";
+    }
+    else if(empty($_POST["email"])) {
+        $erro = "Campo e-mail obrigatorio";
+    }
         else
         {
             //Alteramos aqui também.
@@ -56,15 +56,65 @@ if(isset($_POST["nome"]) && isset($_POST["email"]) && isset($_POST["cidade"]) &&
             }
 
             }
-        }
-        //Se não, vamos realizar a alteração dos dados,
+        
+         //Se não, vamos realizar a alteração dos dados,
             //porém, vamos nos certificar que o valor passado no $id, seja válido para nosso caso
-        else
-        if(is_numeric($id) && $id >= 1)
-        {
-            $stmt = $obj_mysqli->prepare("UPDATE `cliente` SET `nome`=?, `email`=?, `cidade`=?, `uf`=?n WHERE id = ?");
-            $stmt->bind_param('ssssi', )
+         else
+         if(is_numeric($id) && $id >= 1)
+         {
+             $stmt = $obj_mysqli->prepare("UPDATE `cliente` SET `nome`=?, `email`=?, `cidade`=?, `uf`=? WHERE id = ?");
+             $stmt->bind_param('ssssi');
+
+             if(!$stmt->execute())
+             {
+                 $erro = $stmt->error;
+             }
+             else
+             {
+                 header("Location:cadastro.php");
+                 exit;
+             }
+         }
+         //retornar um erro
+         else
+         {
+            $erro = "Número inválido";
+         }
         }
+}
+else
+//Icluimos este bloco, onde vamos verificar a existência do id passado...
+if(isset($_GET["id"]) && is_numeric($_GET["id"]))
+{
+    $id = (int)$_GET["id"];
+
+    if(isset($_GET["del"]))
+    {
+        $stmt = $obj_mysqli->prepare("DELETE FROM `cliente` WHERE id = ?");
+        $stmt->bind_param('i',$id);
+        $stmt->execute();
+
+        header("Location:cadastro.php");
+        exit;
+    }
+    else
+    {
+
+        $stmt = $obj_mysqli->prepare("SELECT * FROM `cliente` WHERE id = ?"); //
+        $stmt->bind_param('i',$id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $aux_query = $result->fetch_assoc();
+
+
+        $nome = $aux_query["Nome"];
+        $email = $aux_query["Email"];
+        $cidade = $aux_query["Cidade"];
+        $uf = $aux_query["UF"];
+
+        $stmt->close();
+    }
 }
 ?>
 
@@ -73,7 +123,7 @@ if(isset($_POST["nome"]) && isset($_POST["email"]) && isset($_POST["cidade"]) &&
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>CRUD com PHP,deformasimplesefácil</title>
 </head>
 <body>
 
@@ -95,8 +145,9 @@ if(isset($sucesso))
     UF:<br/>
     <input type="text" name="uf" size="2" placeholder="UF"> 
     <br/><br/>
-    <input type="hidden" value="-1" name="id" >
-    <button type="submit">Cadastrar</button>
+    <input type="hidden"value="<?=$id?>"name="id" >
+    <!--Alteramos aqui também, para poder mostrar o texto Cadastrar, ou Salvar, de acordo com o momento. :) -->
+    <button type="submit"><?=($id==-1)?"Cadastrar":"Salvar"?></button>
 
 </form>
 
@@ -104,25 +155,27 @@ if(isset($sucesso))
 <br>
 <table width="400px" border="0" cellspacing="0">
     <tr>
-        <td> <strong> # </strong> </td>
-        <td> <strong> Nome </strong> </td>
-        <td> <strong> Email </strong> </td>
-        <td> <strong> Cidade </strong> </td>
-        <td> <strong> UF </strong> </td>
-        <td> <strong> # </strong> </td>
+        <td><strong>#</strong></td>
+        <td><strong>Nome</strong></td>
+        <td><strong>Email</strong></td>
+        <td><strong>Cidade</strong></td>
+        <td><strong>UF</strong></td>
+        <td><strong>#</strong></td>
     </tr>
 
     <?php
         $result = $obj_mysqli->query("SELECT * FROM `cliente`");
+
         while ($aux_query = $result->fetch_assoc())
         {
             echo '<tr>';
-            echo '<td>' .$aux_query["Id"]. '</td>';
-            echo '<td>' .$aux_query["Nome"]. '</td>';
-            echo '<td>' .$aux_query["Email"]. '</td>';
-            echo '<td>' .$aux_query["Cidade"]. '</td>';
-            echo '<td>' .$aux_query["UF"]. '</td>';
+            echo '<td>',$aux_query["Id"], '</td>';
+            echo '<td>',$aux_query["Nome"], '</td>';
+            echo '<td>',$aux_query["Email"], '</td>';
+            echo '<td>',$aux_query["Cidade"], '</td>';
+            echo '<td>',$aux_query["UF"], '</td>';
             echo '<td><a href="'.$_SERVER["PHP_SELF"]. '?id=' .$aux_query["id"]. '">Editar</a></td>';
+            echo' <td><a href="'.$_SERVER["PHP_SELF"]. '?id=' .$aux_query["Id"].'&del=true">Excluir</a></td>';
             echo '</tr>';
         }
     ?>
