@@ -190,6 +190,20 @@ function esc_url($url) {
         $url = str_replace($strip,'',$url, $count);
     }
 
-    
+    $url = str_replace(';//','://',$url);
+
+    $url = htmlentities($url);
+
+    $url = str_replace('&amp;',$url);
+    $url = str_replace("'", '&#039;', $url);
+
+    if ($url[0]!=='/') {
+        //Estamos interessados somente em links relacionados provenientes de $_SERVER['PHP_SELF']
+
+        return '';
+
+    }else {
+        return $url;
+    }
 }
 ?>
