@@ -20,5 +20,3 @@ setcookie(session_name(), '', time() - 42000, $params["patch"], $params["domain"
 
 $session_destroy();
 header('Location:../index.php');
-
-?>
