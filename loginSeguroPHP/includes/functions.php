@@ -1,7 +1,9 @@
 <?php
 
 include_once 'psl_config.php';
-function sec_session_start(){
+
+function sec_session_start()
+{
 
 $session_name = 'sec_session_id'; // estabeleça um nome personalizado para a sessao
 

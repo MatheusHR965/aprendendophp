@@ -9,7 +9,8 @@ require_once 'header.php';
 if( empty($_POST['nome']) || empty($_POST['tele_cli']) || empty($_POST['endereco']) || empty($_POST['cpf']) ) {
 {
     echo "Preencha todos os campos";
-}else{
+}
+else{
  
     $nome = $_POST['nome'];
     $tele_Cli     = $_POST['tele_Cli'];

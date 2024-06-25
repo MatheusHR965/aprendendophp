@@ -8,7 +8,7 @@ sec_session_start(); // Nossa segurança personalizada para iniciar uma sessao p
 if (isset($_POST['email'], $_POST['p'])) {
 
 $email = $_POST['email'];
-$password = $_POST['p']; // The Hashed password.
+$password = $_POST['p']; 
 
 if (login($email, $password, $mysqli) == true) {
 
